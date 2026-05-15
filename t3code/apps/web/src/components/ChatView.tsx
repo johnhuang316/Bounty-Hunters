@@ -3546,12 +3546,22 @@ export default function ChatView(props: ChatViewProps) {
         error={activeThread.error}
         onDismiss={() => setThreadError(activeThread.id, null)}
       />
+      {/* Skip links for keyboard navigation — visually hidden until focused */}
+      <div className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-0 focus-within:top-0 focus-within:z-50 focus-within:flex focus-within:gap-2 focus-within:bg-background focus-within:p-2">
+        <a href="#chat-messages" className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground underline-offset-2 hover:underline focus:outline-2 focus:outline-ring">
+          Skip to messages
+        </a>
+        <a href="#chat-composer" className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground underline-offset-2 hover:underline focus:outline-2 focus:outline-ring">
+          Skip to composer
+        </a>
+      </div>
+
       {/* Main content area with optional plan sidebar */}
       <div className="flex min-h-0 min-w-0 flex-1">
         {/* Chat column */}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {/* Messages Wrapper */}
-          <div className="relative flex min-h-0 flex-1 flex-col">
+          <div id="chat-messages" className="relative flex min-h-0 flex-1 flex-col">
             {/* Messages — LegendList handles virtualization and scrolling internally */}
             <MessagesTimeline
               key={activeThread.id}
@@ -3585,9 +3595,10 @@ export default function ChatView(props: ChatViewProps) {
                 <button
                   type="button"
                   onClick={() => scrollToEnd(true)}
+                  aria-label="Scroll to bottom"
                   className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-muted-foreground text-xs shadow-sm transition-colors hover:border-border hover:text-foreground hover:cursor-pointer"
                 >
-                  <ChevronDownIcon className="size-3.5" />
+                  <ChevronDownIcon className="size-3.5" aria-hidden="true" />
                   Scroll to bottom
                 </button>
               </div>
@@ -3596,6 +3607,7 @@ export default function ChatView(props: ChatViewProps) {
 
           {/* Input bar */}
           <div
+            id="chat-composer"
             className={cn(
               "pl-[calc(env(safe-area-inset-left)+0.75rem)] pr-[calc(env(safe-area-inset-right)+0.75rem)] pt-1.5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)] sm:pt-2",
               isGitRepo

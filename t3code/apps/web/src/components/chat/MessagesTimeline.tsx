@@ -266,6 +266,7 @@ export const MessagesTimeline = memo(function MessagesTimeline({
   return (
     <TimelineRowCtx value={sharedState}>
       <TimelineRowActivityCtx value={activityState}>
+        <div role="log" aria-live="polite" aria-label="Chat messages">
         <LegendList<MessagesTimelineRow>
           ref={listRef}
           data={rows}
@@ -281,6 +282,7 @@ export const MessagesTimeline = memo(function MessagesTimeline({
           ListHeaderComponent={TIMELINE_LIST_HEADER}
           ListFooterComponent={TIMELINE_LIST_FOOTER}
         />
+        </div>
       </TimelineRowActivityCtx>
     </TimelineRowCtx>
   );
@@ -300,8 +302,33 @@ type TimelineWorkEntry = Extract<MessagesTimelineRow, { kind: "work" }>["grouped
 type TimelineRow = MessagesTimelineRow;
 
 const TimelineRowContent = memo(function TimelineRowContent({ row }: { row: TimelineRow }) {
+  const handleRowKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const sibling = e.key === 'ArrowDown'
+        ? target.nextElementSibling
+        : target.previousElementSibling;
+      if (sibling instanceof HTMLElement) {
+        sibling.focus();
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      const composer = document.getElementById('chat-composer');
+      if (composer) {
+        const textarea = composer.querySelector('textarea, [contenteditable]');
+        if (textarea instanceof HTMLElement) {
+          textarea.focus();
+        }
+      }
+    }
+  };
+
   return (
     <div
+      role="listitem"
+      tabIndex={0}
+      onKeyDown={handleRowKeyDown}
       className={cn(
         "pb-4",
         row.kind === "message" && row.message.role === "assistant" ? "group/assistant" : null,
